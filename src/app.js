@@ -1,15 +1,15 @@
-// IdeaCheck — AI Startup Idea Validator
+﻿// IdeaCheck â€” AI Startup Idea Validator
 // Uses OpenAI API (GPT-4o) with two-phase conversation flow
 
 const OPENAI_API_KEY = window.OPENAI_API_KEY || '';
 
-// ─── State ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let conversationHistory = [];
 let phase = 'intake'; // 'intake' | 'scoring'
 let questionCount = 0;
 const MAX_QUESTIONS = 4;
 
-// ─── DOM refs ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ DOM refs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const introScreen = document.getElementById('intro-screen');
 const chatScreen  = document.getElementById('chat-screen');
 const scoreScreen = document.getElementById('score-screen');
@@ -17,14 +17,14 @@ const messagesEl  = document.getElementById('messages');
 const userInput   = document.getElementById('user-input');
 const sendBtn     = document.getElementById('send-btn');
 
-// ─── System prompts ───────────────────────────────────────────────────────────
+// â”€â”€â”€ System prompts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const INTAKE_SYSTEM = `You are IdeaCheck, a sharp but constructive startup analyst. 
 Your job is to understand a founder's startup idea deeply before evaluating it.
 
 PHASE: INTAKE (clarifying questions only)
 
 Rules:
-- Ask ONE clarifying question at a time — no more.
+- Ask ONE clarifying question at a time â€” no more.
 - Ask about: target customer, revenue model, key competitors, unfair advantage, biggest risk.
 - Keep questions short and conversational.
 - Do NOT give any evaluation or scores yet.
@@ -34,7 +34,7 @@ Rules:
 const SCORING_SYSTEM = `You are IdeaCheck, a rigorous startup analyst. 
 Based on the conversation, produce a startup idea scorecard.
 
-Return ONLY a valid JSON object — no markdown, no explanation, just raw JSON:
+Return ONLY a valid JSON object â€” no markdown, no explanation, just raw JSON:
 
 {
   "overall": <number 1-10>,
@@ -69,7 +69,7 @@ Return ONLY a valid JSON object — no markdown, no explanation, just raw JSON:
   "pivot": "<if overall < 6, suggest a specific pivot in 2 sentences. Otherwise return empty string>"
 }`;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function showScreen(screen) {
   [introScreen, chatScreen, scoreScreen].forEach(s => {
     s.classList.remove('active');
@@ -82,7 +82,7 @@ function showScreen(screen) {
 function addMessage(role, text) {
   const msg = document.createElement('div');
   msg.className = `message ${role}`;
-  const avatar = role === 'ai' ? '💡' : '👤';
+  const avatar = role === 'ai' ? 'ðŸ’¡' : 'ðŸ‘¤';
   msg.innerHTML = `
     <div class="avatar">${avatar}</div>
     <div class="bubble">${text.replace(/\n/g, '<br>')}</div>
@@ -96,7 +96,7 @@ function showTyping() {
   typing.className = 'message ai';
   typing.id = 'typing-indicator';
   typing.innerHTML = `
-    <div class="avatar">💡</div>
+    <div class="avatar">ðŸ’¡</div>
     <div class="bubble typing">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
@@ -116,7 +116,7 @@ function setLoading(loading) {
   sendBtn.textContent = loading ? '...' : 'Send';
 }
 
-// ─── API call ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ API call â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function callOpenAI(systemPrompt, messages, jsonMode = false) {
   const body = {
     model: 'gpt-4o',
@@ -131,11 +131,11 @@ async function callOpenAI(systemPrompt, messages, jsonMode = false) {
     body.response_format = { type: 'json_object' };
   }
 
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('/api/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(body)
   });
@@ -149,7 +149,7 @@ async function callOpenAI(systemPrompt, messages, jsonMode = false) {
   return data.choices[0].message.content;
 }
 
-// ─── Score rendering ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Score rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getScoreColor(score) {
   if (score >= 7) return 'high';
   if (score >= 5) return 'mid';
@@ -193,7 +193,7 @@ function renderScorecard(data) {
   if (data.pivot) {
     pivotEl.style.display = 'block';
     pivotEl.innerHTML = `
-      <h3>💡 Suggested Pivot</h3>
+      <h3>ðŸ’¡ Suggested Pivot</h3>
       <p>${data.pivot}</p>
     `;
   }
@@ -201,7 +201,7 @@ function renderScorecard(data) {
   showScreen(scoreScreen);
 }
 
-// ─── Generate scorecard ───────────────────────────────────────────────────────
+// â”€â”€â”€ Generate scorecard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function generateScorecard() {
   showTyping();
   setLoading(true);
@@ -219,7 +219,7 @@ async function generateScorecard() {
   }
 }
 
-// ─── Send message ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Send message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function sendMessage() {
   const text = userInput.value.trim();
   if (!text) return;
@@ -235,7 +235,7 @@ async function sendMessage() {
     removeTyping();
 
     if (reply.includes('READY_TO_SCORE')) {
-      addMessage('ai', "Perfect — I have everything I need. Generating your scorecard now...");
+      addMessage('ai', "Perfect â€” I have everything I need. Generating your scorecard now...");
       conversationHistory.push({ role: 'assistant', content: reply });
       await generateScorecard();
     } else {
@@ -251,7 +251,7 @@ async function sendMessage() {
   }
 }
 
-// ─── Start chat ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Start chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function startChat() {
   showScreen(chatScreen);
   conversationHistory = [];
@@ -259,12 +259,12 @@ async function startChat() {
   phase = 'intake';
   messagesEl.innerHTML = '';
 
-  const opening = "Hey! Tell me about your startup idea — what problem does it solve and for who? Don't worry about perfection, just describe it naturally.";
+  const opening = "Hey! Tell me about your startup idea â€” what problem does it solve and for who? Don't worry about perfection, just describe it naturally.";
   addMessage('ai', opening);
   conversationHistory.push({ role: 'assistant', content: opening });
 }
 
-// ─── Copy report ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Copy report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function copyReport() {
   const dims = document.querySelectorAll('.dim-card');
   let report = '=== IdeaCheck Startup Scorecard ===\n\n';
@@ -280,12 +280,12 @@ function copyReport() {
 
   navigator.clipboard.writeText(report).then(() => {
     const btn = document.getElementById('copy-btn');
-    btn.textContent = '✓ Copied!';
+    btn.textContent = 'âœ“ Copied!';
     setTimeout(() => btn.textContent = 'Copy Report', 2000);
   });
 }
 
-// ─── Event listeners ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Event listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('start-btn').addEventListener('click', startChat);
 document.getElementById('restart-btn').addEventListener('click', () => showScreen(introScreen));
 document.getElementById('copy-btn').addEventListener('click', copyReport);
@@ -300,3 +300,5 @@ userInput.addEventListener('keydown', e => {
 
 // Init
 showScreen(introScreen);
+
+
